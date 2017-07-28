@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 练习：学生成绩单（API版）
 
 ## 练习目标
@@ -100,3 +101,6 @@ JSON语法：http://www.w3school.com.cn/json/json_syntax.asp
 AJAX教程：[http://www.w3school.com.cn/ajax/ajax_intro.asp](http://www.w3school.com.cn/ajax/ajax_intro.asp)
 
 JavaScript 闯关记：[https://github.com/stone0090/javascript-lessons/](https://github.com/stone0090/javascript-lessons/)
+=======
+# api-scoresheet
+>>>>>>> 5667703f24582039d601250a2db1cc71dc840002
