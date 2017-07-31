@@ -123,23 +123,21 @@ expressapp.put('/students/:id',function (req,res) {
         avg:0,
     };
     let sameIdstr=redisclient.get(infoarr.id,function (err,reply) {
-        reply
-    });
-    if (!sameIdstr){
-        res.send('请按正确的格式输入');
-    }else {
-        let sameIdArr=JSON.parse(sameIdstr);//same id's student info(str)
-        if (sameIdArr.id===infoarr.id){
-            let infostr=JSON.stringify(infoarr);
-            redisclient.set(infoarr.id,infostr);
-            redisclient.get(infoarr.id,function (err,reply) {
-                res.send(reply);
-            });
-        }else{
+        if (err){
             res.send('请按正确的格式输入');
+        }else {
+            let sameIdArr=JSON.parse(sameIdstr);//same id's student info(str)
+            if (sameIdArr.id===infoarr.id){
+                let infostr=JSON.stringify(infoarr);
+                redisclient.set(infoarr.id,infostr);
+                redisclient.get(infoarr.id,function (err,reply) {
+                    res.send(reply);
+                });
+            }else{
+                res.send('请按正确的格式输入');
+            }
         }
-    }
-
+    });
 });
 
 expressapp.delete('/students/:id',function (req,res) {
