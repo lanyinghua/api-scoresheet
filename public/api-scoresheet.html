@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>student-score-sheet-api-version</title>
+    <script src="../api-server.js" ></script>
+</head>
+<body>
+
+<h4>添加一条学生成绩信息</h4>
+<form  name="testform" onsubmit="addinfo()" id="testform">
+
+    <div class="row">
+        <div  class="col-sm-6 col-md-3">
+            姓名
+            <input type="text" name="name" id="name">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            学号
+            <input type="text" name="id" id="id">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            民族
+            <input type="text" name="nation" id="nation">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            班级
+            <input type="text" name="klass" id="klass">
+        </div>
+    </div>
+    <div class="row">
+        <div  class="col-sm-6 col-md-3">
+            数学
+            <input type="text" name="mat" id="mat">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            语文
+            <input type="text" name="chi" id="chi">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            英语
+            <input type="text" name="eng" id="eng">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            编程
+            <input type="text" name="pro" id="pro">
+        </div>
+    </div>
+    <p></p>
+    <input type="submit" id="tj" value="提交" >
+</form>
+
+</body>
+</html>

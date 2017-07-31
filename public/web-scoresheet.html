@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生成绩管理系统（Web版）</title>
+    <link rel="stylesheet" href="./bootstrap-3.3.7-dist/css/bootstrap.css">
+    <script src="./bootstrap-3.3.7-dist/js/jquery.min.js"></script>
+    <script src="./bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="./web-scoresheet-css.css">
+    <script src="../api-server.js" ></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // execute when DOM content is loaded
+            document.getElementById('scoresheet').addEventListener('submit', function (event) {
+                event.preventDefault();
+                return false;
+            })
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // execute when DOM content is loaded
+            document.getElementById('correctform').addEventListener('submit', function (event) {
+                event.preventDefault();
+                return false;
+            })
+        });
+    </script>
+
+
+</head>
+<body id="back-to-top">
+
+<div class="container">
+
+    <h3>学生成绩单</h3>
+    <div class="imgcontainer">
+        <img  src="./eng-America.jpg" class="imgstyle">
+    </div>
+
+<p>&nbsp;</p>
+<div>
+    <table class="table table-bordered tablestyle" >
+        <thead>
+        <tr>
+            <th>姓名</th>
+            <th>学号</th>
+            <th>数学</th>
+            <th>语文</th>
+            <th>英语</th>
+            <th>编程</th>
+            <th>总分</th>
+        </tr>
+        </thead>
+        <tbody id="table">
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-md-4">
+        <table class="table-bordered tablestyle" >
+    <tr>
+        <th>总分平均分</th>
+        <th>总分中位数</th>
+    </tr>
+    <tbody id="avgmedian">
+    </tbody>
+        </table>
+    </div>
+</div>
+
+<hr style="height:1px;border:none;border-top:1px dashed darkgrey;" />
+    <!--<div class="col-sm-12 col-md-4 " >-->
+<h4>添加一条学生成绩信息</h4>
+<form name="testform"  id="testform"  method="post" action="/student">
+
+ <div class="row">
+     <div  class="col-sm-6 col-md-3">
+         姓名
+         <input type="text" name="name" id="name">
+     </div>
+     <div  class="col-sm-6 col-md-3">
+         学号
+         <input type="text" name="id" id="id">
+     </div>
+     <div  class="col-sm-6 col-md-3">
+         民族
+         <input type="text" name="nation" id="nation">
+     </div>
+     <div  class="col-sm-6 col-md-3">
+         班级
+         <input type="text" name="class" id="klass">
+     </div>
+ </div>
+    <div class="row">
+        <div  class="col-sm-6 col-md-3">
+            数学
+            <input type="text" name="mat" id="mat">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            语文
+            <input type="text" name="chi" id="chi">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            英语
+            <input type="text" name="eng" id="eng">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            编程
+            <input type="text" name="pro" id="pro">
+        </div>
+    </div>
+<p></p>
+    <input type="submit" id="tj" value="提交" >
+</form>
+
+<hr style="height:1px;border:none;border-top:1px dashed darkgrey;" />
+
+<form name="scoresheet"  id="scoresheet" method="get" action="/students">
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <h4>
+                查询学生成绩(学号, 学号,...)
+            </h4>
+        </div>
+        <div class="col-sm-6 col-md-6">
+            <p><input type="text"  id="stuid" name="stuid"></p>
+        </div>
+        <div class="col-sm-6 col-md-2">
+            <input type="submit" value="查询" >
+            <input type="button" value="All" onclick="printall()">
+        </div>
+    </div>
+</form>
+
+    <hr style="height:1px;border:none;border-top:1px dashed darkgrey;" />
+
+<form name="delete" onsubmit="deleteinfo()" id="delete" method="delete" action="/students/:id">
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <h4>
+                删除一条学生成绩信息(输入学号)
+            </h4>
+        </div>
+        <div class="col-sm-6 col-md-6">
+            <p> <input type="text"  id="deleteid"name="deleteid"></p>
+        </div>
+        <div class="col-sm-6 col-md-2">
+            <input type="submit" value="删除" id="sc">
+        </div>
+    </div>
+
+</form>
+
+    <hr style="height:1px;border:none;border-top:1px dashed darkgrey;" />
+
+<h4>修改一条学生成绩信息</h4>
+<form name="testform" onsubmit="changeinfo()" id="correctform" method="put" action="/students/:id">
+    <div class="row">
+        <div  class="col-sm-6 col-md-3">
+            姓名
+            <input type="text" name="name" id="crtname">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            学号
+            <input type="text" name="id" id="crtid">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            民族
+            <input type="text" name="nation" id="crtnation">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            班级
+            <input type="text" name="class" id="crtklass">
+        </div>
+    </div>
+    <div class="row">
+        <div  class="col-sm-6 col-md-3">
+            数学
+            <input type="text" name="mat" id="crtmat">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            语文
+            <input type="text" name="chi" id="crtchi">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            英语
+            <input type="text" name="eng" id="crteng">
+        </div>
+        <div  class="col-sm-6 col-md-3">
+            编程
+            <input type="text" name="pro" id="crtpro">
+        </div>
+    </div>
+    <p></p>
+    <input type="submit" value="修改" >
+</form>
+
+    <hr style="height:1px;border:none;border-top:1px dashed darkgrey;" />
+
+    <div align="center">
+        <a href="#back-to-top">back to top</a>
+    </div>
+
+    <div>&nbsp;</div>
+</div>
+
+<script src="./scoresheet.js"></script>
+<script src="./scoresheet2.js"></script>
+</body>
+</html>
