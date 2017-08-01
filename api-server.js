@@ -12,44 +12,18 @@ var count=0;
 var redis= require('redis');
 var redisclient=redis.createClient();
 
-
+//-------- 查询--------
 expressapp.get('/students',function(req,res){
-    $('#table').html('');
-    $('#avgmedian').html('');
-    let key=req.body.stuid;//666,23...
+    let key=req.query.stuid;//666,23...
     let keyarr=key.split(',');//keyarr=['666','23'...]
-    let newtr;
     let totalarr=[];
-    for (let i=0;i<keyarr.length;i++){
-        let infostr=redisclient.get(keyarr[i],function (err,reply) {
-            if (err){
-                res.send('请按正确的格式输入要打印的学生的学号~*^_^*\n400')
-            }else {
-                let infoarr=JSON.parse(infostr);
-                totalarr.push(infoarr.total);
-                newtr="<tr >"+
-                    "<td>"+infoarr.name+"</td>"+
-                    "<td>"+infoarr.id+"</td>"+
-                    "<td>"+infoarr.mat+"</td>"+
-                    "<td>"+infoarr.chi+"</td>"+
-                    "<td>"+infoarr.eng+"</td>"+
-                    "<td>"+infoarr.pro+"</td>"+
-                    "<td>"+infoarr.total+"</td>"+
-                    "</tr>";
-                $('#table').append(newtr);
-                res.send(reply);
-            }
-        })
-    };
-    let totaltr="<tr>"+
-        "<td>"+medianOfTotalOfClass(totalarr)+"</td>"+
-        "<td>"+avgOfTotalOfClass(totalarr)+"</td>"+
-        "</tr>";
-    redisclient.set('medAndAvg',totaltr);
-    redisclient.get('medAndAvg',function (err,reply) {
-       res.send(reply)
-    });
-    $('#avgmedian').append(totaltr);
+    redisclient.mget(keyarr,function (err,reply) {
+        if (err){
+            res.status(400).send('请按正确的格式输入要打印的学生的学号~*^_^*')
+        }else {
+            res.send(reply);
+        }
+    })
 });
 
 function medianOfTotalOfClass(arr) {//totalarr:[num]
@@ -77,13 +51,13 @@ function avgOfTotalOfClass(arr){//arr=totalarr:[num]
 }
 
 expressapp.use(express.static('public'));
-expressapp.get('/student', function (req, res) {
+expressapp.get('/', function (req, res) {
     res.sendFile( __dirname + "/public/web-scoresheet.html" );
 });
 
 
 expressapp.post('/student',function (req,res) {
-    let infoarr={
+    let infobj={
        name: req.body.name,
        id: req.body.id,
        nation: req.body.nation,
@@ -95,56 +69,58 @@ expressapp.post('/student',function (req,res) {
         total:0,
         avg:0,
     };
-    if (infoarr.name.length<4 && infoarr.name!==""&&infoarr.id !==''){//如果输入格式正确就会返回
-        infoarr.total=parseInt(infoarr.mat)+parseInt(infoarr.chi)+parseInt(infoarr.eng)+parseInt(infoarr.pro);
-        infoarr.avg=(infoarr.total/4).toFixed(2);
-        let infostr=JSON.stringify(infoarr);
-        redisclient.set(`${infoarr.id}`,infostr);
-        redisclient.get(`${infoarr.id}`,function (err,reply) {
+    if (infobj.name.length<4 && infobj.name!==""&&infobj.id !==''){//如果输入格式正确就会返回
+        infobj.total=parseInt(infobj.mat)+parseInt(infobj.chi)+parseInt(infobj.eng)+parseInt(infobj.pro);
+        infobj.avg=(infobj.total/4).toFixed(2);
+        let infostr=JSON.stringify(infobj);
+        redisclient.set(infobj.id,infostr);
+        redisclient.get(infobj.id,function (err,reply) {
             res.send(reply);
         })
     }else {//如果输入格式不正确
-        res.send('请按正确的格式输入（格式：姓名, 学号, 学科: 成绩, ...）\n400')
+        res.status(400).send('请按正确的格式输入（格式：姓名, 学号, 学科: 成绩, ...）')
     }
 
 });
 
 expressapp.put('/students/:id',function (req,res) {
-    let infoarr={
-        name: req.body.crtname,
-        id: req.body.crtid,
-        nation: req.body.crtnation,
-        klass: req.body.crtklass,
-        mat: req.body.crtmat,
-        chi: req.body.crtchi,
-        eng: req.body.crteng,
-        pro: req.body.crtpro,
-        total:0,
-        avg:0,
-    };
-    let sameIdstr=redisclient.get(infoarr.id,function (err,reply) {
-        if (err){
-            res.send('请按正确的格式输入');
-        }else {
-            let sameIdArr=JSON.parse(sameIdstr);//same id's student info(str)
-            if (sameIdArr.id===infoarr.id){
-                let infostr=JSON.stringify(infoarr);
-                redisclient.set(infoarr.id,infostr);
-                redisclient.get(infoarr.id,function (err,reply) {
+    let id=req.params.id;
+    redisclient.get(id,function (err,reply) {
+        if(err){
+            res.status(400).send(('请按正确的格式输入'));
+        }else{
+            let infobj={
+                name: req.body.crtname,
+                id: req.body.crtid,
+                nation: req.body.crtnation,
+                klass: req.body.crtklass,
+                mat: req.body.crtmat,
+                chi: req.body.crtchi,
+                eng: req.body.crteng,
+                pro: req.body.crtpro,
+                total:0,
+                avg:0,
+            };
+            if (infobj.name!==""&&infobj.id !==''){//如果输入格式正确就会返回
+                infobj.total=parseInt(infobj.mat)+parseInt(infobj.chi)+parseInt(infobj.eng)+parseInt(infobj.pro);
+                infobj.avg=(infobj.total/4).toFixed(2);
+                let infostr=JSON.stringify(infobj);
+                redisclient.set(infobj.id,infostr);
+                redisclient.get(infobj.id,function (err,reply) {
                     res.send(reply);
-                });
-            }else{
-                res.send('请按正确的格式输入');
+                })
+            }else {//如果输入格式不正确
+                res.status(400).send('请按正确的格式输入（格式：姓名, 学号, 学科: 成绩, ...）')
             }
         }
-    });
+    })
 });
 
 expressapp.delete('/students/:id',function (req,res) {
-    let key=req.body.deleteid;
+    let key=req.params.id;
     redisclient.get('key',function (err,reply) {
         if (err){
-            res.send(`该学生不存在\n错误码404`)
+            res.status(404).send(`该学生不存在`)
         }else {
             redisclient.del('key');
             res.send('该学生已成功删除')
